@@ -1,124 +1,15 @@
 # TokenMeter 开发任务追踪
 
 ## 当前状态
-**Day**: 0（准备阶段）
-**进度**: 0%
-**状态**: 🟡 准备中
+**Day**: 2（多厂商支持）
+**进度**: 50%
+**状态**: 🟢 Day 2 已完成
 
 ---
 
-## 任务清单
+## Day 0 - 项目启动 ✅
 
-### 📍 Milestone 1: 基础加固
-
-#### Day 1 - 错误处理与日志
-- [ ] 创建全局异常捕获中间件
-- [ ] 实现结构化日志（JSON）
-- [ ] 请求/响应日志中间件
-- [ ] 错误分类体系
-
-#### Day 2 - 测试框架
-- [ ] pytest 配置文件
-- [ ] pricing.py 单元测试
-- [ ] handler.py 单元测试（mock）
-- [ ] API 路由测试
-
-#### Day 3 - Docker 化
-- [ ] 优化 Dockerfile
-- [ ] 完善 docker-compose.yml
-- [ ] 添加健康检查
-- [ ] 编写部署文档
-
-### 📍 Milestone 2: 多厂商支持
-
-#### Day 4 - 架构重构
-- [ ] 创建 Provider 抽象基类
-- [ ] 重构代理路由
-- [ ] 统一配置管理
-
-#### Day 5 - Azure OpenAI
-- [ ] Azure 认证适配
-- [ ] Deployment 路由
-- [ ] 测试用例
-
-#### Day 6 - Anthropic Claude
-- [ ] Claude API 适配
-- [ ] 流式响应
-- [ ] 测试用例
-
-#### Day 7 - 通义千问
-- [ ] DashScope 适配
-- [ ] 中文模型定价
-- [ ] 测试用例
-
-### 📍 Milestone 3: 预算预警
-
-#### Day 8 - 预算引擎
-- [ ] Budget 数据模型
-- [ ] 预算 CRUD API
-- [ ] 预算计算逻辑
-
-#### Day 9 - 飞书集成
-- [ ] Webhook 发送器
-- [ ] 消息模板
-- [ ] 飞书卡片格式
-
-#### Day 10 - 预警系统
-- [ ] 阈值监控任务
-- [ ] 预警触发逻辑
-- [ ] 告警历史
-
-#### Day 11 - 仪表盘
-- [ ] 预算展示组件
-- [ ] 预警配置界面
-- [ ] 测试通知功能
-
-### 📍 Milestone 4: 用户与安全
-
-#### Day 12 - 认证系统
-- [ ] JWT 实现
-- [ ] 注册/登录 API
-- [ ] 密码加密（bcrypt）
-
-#### Day 13 - 数据导出
-- [ ] CSV 导出功能
-- [ ] 备份脚本
-- [ ] 定时任务
-
-### 📍 Milestone 5: 发布
-
-#### Day 14 - 文档
-- [ ] 部署文档
-- [ ] API 文档
-- [ ] 使用教程
-
-#### Day 15 - 发布
-- [ ] GitHub Release
-- [ ] 技术文章
-- [ ] 社交媒体
-
----
-
-## 进度统计
-
-```
-总任务: 0/35
-完成率: 0%
-
-Milestone 1: 0/9 (0%)
-Milestone 2: 0/10 (0%)
-Milestone 3: 0/10 (0%)
-Milestone 4: 0/4 (0%)
-Milestone 5: 0/2 (0%)
-```
-
----
-
-## 每日记录
-
-### Day 0 (2025-03-13) - 项目启动日
-
-#### 完成内容
+### 完成内容
 | 任务 | 状态 | 详情 |
 |------|------|------|
 | 项目初始化 | ✅ | TokenMeter MVP 代码完成 |
@@ -129,35 +20,89 @@ Milestone 5: 0/2 (0%)
 | Demo 上线 | ✅ | https://elbert-haustellate-jett.ngrok-free.dev |
 | 企业定价 | ✅ | ¥5000/套 |
 
-#### 关键产出
-- **Authtoken**: `3AtYb8UokjWL4BHmWh1vru0XpbQ_b8eCJ7aM6YFeytJf8Wvv`
-- **Demo 地址**: https://elbert-haustellate-jett.ngrok-free.dev
-- **代码提交**: 6 commits
+---
 
-#### 问题记录
-- ngrok 下载慢（网络问题，已解决）
-- Docker 未安装（改用 Python 直接运行）
+## Day 1 - 基础加固 ✅
 
-#### 明日计划
-- Day 1: 错误处理 + 日志系统 + 测试框架
+### 完成内容
+| 任务 | 状态 | 产出 |
+|------|------|------|
+| 全局异常捕获 | ✅ | ErrorHandlerMiddleware |
+| 结构化日志 | ✅ | JSONFormatter, logging_config.py |
+| 请求追踪 ID | ✅ | request_id_context, X-Request-ID |
+| 错误分类体系 | ✅ | 8 种自定义异常 |
+| pytest 配置 | ✅ | pytest.ini |
+| 单元测试 | ✅ | 12 个测试用例，100%通过 |
+| API 集成测试 | ✅ | 健康检查、统计接口 |
+| 代码提交 | ✅ | 3 commits |
 
 ---
 
-### Day 1 (2025-03-14) - 基础加固日
+## Day 2 - 多厂商支持 ✅
 
-#### 任务清单
-- [x] 1. 全局异常捕获中间件
-- [x] 2. 结构化日志（JSON格式）
-- [x] 3. 请求追踪 ID
-- [x] 4. 错误分类体系
-- [x] 5. pytest 配置
-- [x] 6. pricing.py 单元测试 (12个用例)
-- [x] 7. API 集成测试
-- [x] 8. 代码提交
+### 完成内容
+| 任务 | 状态 | 产出 |
+|------|------|------|
+| Provider 抽象基类 | ✅ | BaseProvider, ProviderConfig |
+| OpenAI 适配 | ✅ | OpenAIProvider |
+| Azure OpenAI 适配 | ✅ | AzureOpenAIProvider, deployment 路由 |
+| Anthropic Claude 适配 | ✅ | AnthropicProvider, x-api-key |
+| DashScope 适配 | ✅ | DashScopeProvider, 通义千问 |
+| Proxy Handler 重构 | ✅ | 多厂商支持版本 |
+| 定价配置更新 | ✅ | anthropic, dashscope, tongyi |
+| 单元测试 | ✅ | 17 个测试用例，100%通过 |
+| 代码提交 | ✅ | 1 commit |
 
-#### 进度跟踪
-**状态**: 🟢 已完成
-**开始时间**: 23:08
-**完成时间**: 23:40
-**测试通过率**: 12/12 (100%)
+### 支持厂商
+- ✅ OpenAI (openai)
+- ✅ Azure OpenAI (azure)
+- ✅ Anthropic Claude (anthropic, claude)
+- ✅ 阿里云 DashScope/通义千问 (dashscope, tongyi)
 
+---
+
+## Day 3 - 预算预警系统 🚧
+
+### 计划任务
+- [ ] Budget 数据模型
+- [ ] 预算 CRUD API
+- [ ] 预算计算引擎
+- [ ] 飞书 Webhook 通知
+- [ ] 阈值监控系统
+- [ ] 仪表盘预算展示
+
+---
+
+## 测试统计
+
+```
+总计: 29 个测试用例
+- pricing: 12 passed
+- providers: 17 passed
+- api: 8 passed (integration)
+
+覆盖率: 持续增长中
+```
+
+---
+
+## 代码提交历史
+
+```
+ab5dfd8 Day 2: Multi-provider support
+320037b Day 1 complete: Add pytest config
+45e3359 Day 1: Add error handling, logging, and tests
+500a7ee Day 0: Project setup complete
+```
+
+---
+
+## 当前 Demo 地址
+
+**https://elbert-haustellate-jett.ngrok-free.dev**
+
+⚠️ 首次访问需点击 "Visit Site"
+
+---
+
+**最后更新**: 2025-03-14 00:15
