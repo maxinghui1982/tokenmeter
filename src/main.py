@@ -1,6 +1,7 @@
 """
 TokenMeter Main Application
 """
+import os
 from contextlib import asynccontextmanager
 from fastapi import FastAPI, Request
 from fastapi.staticfiles import StaticFiles
@@ -21,6 +22,31 @@ from .utils.error_handler import (
 
 # 配置日志
 logger = get_logger(__name__)
+
+
+def load_provider_configs():
+    """从环境变量加载提供商配置"""
+    configs = {
+        "openai": {
+            "base_url": os.getenv("OPENAI_BASE_URL", "https://api.openai.com"),
+            "api_key": os.getenv("OPENAI_API_KEY"),
+        },
+        "azure": {
+            "base_url": os.getenv("AZURE_OPENAI_BASE_URL", "https://your-resource.openai.azure.com"),
+            "api_key": os.getenv("AZURE_OPENAI_API_KEY"),
+            "deployment": os.getenv("AZURE_OPENAI_DEPLOYMENT"),
+        },
+        "anthropic": {
+            "base_url": os.getenv("ANTHROPIC_BASE_URL", "https://api.anthropic.com"),
+            "api_key": os.getenv("ANTHROPIC_API_KEY"),
+            "api_version": os.getenv("ANTHROPIC_API_VERSION", "2023-06-01"),
+        },
+        "dashscope": {
+            "base_url": os.getenv("DASHSCOPE_BASE_URL", "https://dashscope.aliyuncs.com/api/v1"),
+            "api_key": os.getenv("DASHSCOPE_API_KEY"),
+        },
+    }
+    return configs
 
 
 @asynccontextmanager
@@ -81,13 +107,18 @@ async def proxy_route(provider: str, path: str, request: Request):
     """
     代理 API 请求
     
-    示例:
-    - /proxy/openai/v1/chat/completions -> 转发到 OpenAI
-    - /proxy/azure/openai/deployments/gpt-4/chat/completions -> 转发到 Azure
+    支持提供商:
+    - openai: /proxy/openai/v1/chat/completions
+    - azure: /proxy/azure/openai/deployments/{deployment}/chat/completions
+    - anthropic: /proxy/anthropic/v1/messages
+    - dashscope: /proxy/dashscope/api/v1/services/aigc/text-generation/generation
     """
     from .database.models import db_manager
     db = db_manager.get_session()
-    handler = ProxyHandler(db)
+    
+    # 加载配置
+    provider_configs = load_provider_configs()
+    handler = ProxyHandler(db, provider_configs)
     
     try:
         response = await handler.proxy_request(
@@ -105,7 +136,10 @@ async def proxy_route_root(provider: str, request: Request):
     """代理根路径请求"""
     from .database.models import db_manager
     db = db_manager.get_session()
-    handler = ProxyHandler(db)
+    
+    # 加载配置
+    provider_configs = load_provider_configs()
+    handler = ProxyHandler(db, provider_configs)
     
     try:
         response = await handler.proxy_request(

@@ -33,6 +33,21 @@ DEFAULT_PRICING = {
         "claude-2.1": {"input": 0.008, "output": 0.024},
         "claude-2.0": {"input": 0.008, "output": 0.024},
     },
+    "anthropic": {
+        "claude-3-opus-20240229": {"input": 0.015, "output": 0.075},
+        "claude-3-sonnet-20240229": {"input": 0.003, "output": 0.015},
+        "claude-3-haiku-20240307": {"input": 0.00025, "output": 0.00125},
+    },
+    "dashscope": {
+        "qwen-max": {"input": 0.003, "output": 0.009},
+        "qwen-plus": {"input": 0.001, "output": 0.002},
+        "qwen-turbo": {"input": 0.0005, "output": 0.001},
+    },
+    "tongyi": {
+        "qwen-max": {"input": 0.003, "output": 0.009},
+        "qwen-plus": {"input": 0.001, "output": 0.002},
+        "qwen-turbo": {"input": 0.0005, "output": 0.001},
+    },
 }
 
 
