@@ -116,11 +116,47 @@ Milestone 5: 0/2 (0%)
 
 ## 每日记录
 
-### Day 0 (2025-03-13)
-- ✅ 完成执行计划
-- ✅ 配置 Docker
-- ✅ 更新 README
-- ✅ 配置 ngrok 脚本
-- ✅ 确定企业版定价：¥5000/套
-- 📝 明日开始 Day 1 开发
+### Day 0 (2025-03-13) - 项目启动日
+
+#### 完成内容
+| 任务 | 状态 | 详情 |
+|------|------|------|
+| 项目初始化 | ✅ | TokenMeter MVP 代码完成 |
+| 文档体系 | ✅ | README、Roadmap、PRD、Dev Plan |
+| Docker 配置 | ✅ | Dockerfile、docker-compose.yml |
+| ngrok 注册 | ✅ | 获取 Authtoken，配置完成 |
+| 依赖安装 | ✅ | Python 3.9 + 所有包安装 |
+| Demo 上线 | ✅ | https://elbert-haustellate-jett.ngrok-free.dev |
+| 企业定价 | ✅ | ¥5000/套 |
+
+#### 关键产出
+- **Authtoken**: `3AtYb8UokjWL4BHmWh1vru0XpbQ_b8eCJ7aM6YFeytJf8Wvv`
+- **Demo 地址**: https://elbert-haustellate-jett.ngrok-free.dev
+- **代码提交**: 6 commits
+
+#### 问题记录
+- ngrok 下载慢（网络问题，已解决）
+- Docker 未安装（改用 Python 直接运行）
+
+#### 明日计划
+- Day 1: 错误处理 + 日志系统 + 测试框架
+
+---
+
+### Day 1 (2025-03-14) - 基础加固日
+
+#### 任务清单
+- [ ] 1. 全局异常捕获中间件
+- [ ] 2. 结构化日志（JSON格式）
+- [ ] 3. 请求追踪 ID
+- [ ] 4. 错误分类体系
+- [ ] 5. pytest 配置
+- [ ] 6. pricing.py 单元测试
+- [ ] 7. handler.py 单元测试
+- [ ] 8. API 集成测试
+
+#### 进度跟踪
+**状态**: 🟡 进行中
+**开始时间**: 23:08
+**预计完成**: 03:00（明天凌晨）
 
