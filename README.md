@@ -8,14 +8,21 @@
 
 **TokenMeter** 是一款开源的企业级 AI 成本管理工具，帮助企业追踪、归因和优化多源 MaaS（Model as a Service）支出。
 
+📖 **开源策略**: 核心功能完全开源（MIT），高级功能（SSO、高级报表、企业级支持）提供商业授权。
+
+---
+
 ## ✨ 核心特性
 
-- 📊 **多源聚合** - 统一监控 OpenAI、Azure OpenAI、Claude、文心一言等主流 MaaS 提供商
+- 📊 **多源聚合** - 统一监控 OpenAI、Azure OpenAI、Claude、通义千问等主流 MaaS 提供商
 - 🏷️ **精细归因** - 按项目、团队、环境、用户多维度标记和分摊成本
 - ⚡ **实时监控** - 分钟级成本更新，告别月底账单惊吓
 - 🚨 **智能预警** - 预算超支、用量突增、异常模式自动告警
 - 📈 **财务级报表** - 支持成本分摊计算和财务导出
 - 🔒 **隐私优先** - 支持本地化部署，数据不出企业
+- 🚀 **飞书集成** - 原生支持飞书 webhook 通知
+
+---
 
 ## 🎯 适用场景
 
@@ -26,22 +33,34 @@
 | 多厂商管理 | 3个云厂商=3个账单 | 统一仪表盘 |
 | 成本优化 | 不知道钱花在哪值不值 | 调用分析+优化建议 |
 
+---
+
 ## 🚀 快速开始
 
-### 安装
+### 方式一：Docker 部署（推荐）
 
 ```bash
-# 克隆仓库
-git clone https://github.com/yourusername/tokenmeter.git
+# 1. 克隆仓库
+git clone https://github.com/mxinghui/tokenmeter.git
 cd tokenmeter
 
-# 安装依赖
+# 2. 启动服务
+docker-compose up -d
+
+# 3. 访问仪表盘
+open http://localhost:8080
+```
+
+### 方式二：源码安装
+
+```bash
+# 1. 安装依赖
 pip install -r requirements.txt
 
-# 初始化数据库
+# 2. 初始化数据库
 python -m src.database.init
 
-# 启动服务
+# 3. 启动服务
 python -m src.main
 ```
 
@@ -52,26 +71,22 @@ python -m src.main
 ```python
 import openai
 
-# 原来：直接调用 OpenAI
-# openai.api_base = "https://api.openai.com/v1"
-
-# 现在：通过 TokenMeter 代理
-openai.api_base = "http://localhost:8080/proxy/openai"
+# 配置 TokenMeter 代理
+openai.api_base = "http://localhost:8080/proxy/openai/v1"
 openai.default_headers = {
     "X-Cost-Project": "customer-service-bot",
     "X-Cost-Team": "ai-platform",
     "X-Cost-Env": "production"
 }
+
+# 正常调用，成本自动追踪
+response = openai.ChatCompletion.create(
+    model="gpt-4",
+    messages=[{"role": "user", "content": "Hello!"}]
+)
 ```
 
-### 查看仪表盘
-
-打开浏览器访问 `http://localhost:8080`，即可查看：
-
-- 实时成本概览
-- 项目维度分析
-- 模型使用统计
-- 预算执行情况
+---
 
 ## 🏗️ 架构设计
 
@@ -99,6 +114,8 @@ openai.default_headers = {
 └──────────────┘ └──────────────┘ └──────────────┘
 ```
 
+---
+
 ## 📁 项目结构
 
 ```
@@ -107,65 +124,52 @@ tokenmeter/
 │   ├── proxy/          # API 代理层
 │   ├── database/       # 数据模型与存储
 │   ├── api/            # REST API
-│   └── web/            # Web 仪表盘
+│   ├── web/            # Web 仪表盘
+│   └── auth/           # 认证与权限（开源版基础功能）
 ├── config/             # 配置文件
 ├── docs/               # 文档
 ├── tests/              # 测试用例
+├── docker/             # Docker 配置
 └── examples/           # 使用示例
 ```
 
-## 🔧 配置说明
+---
 
-创建 `config/config.yaml`：
+## 🔧 功能对比
 
-```yaml
-server:
-  host: 0.0.0.0
-  port: 8080
+| 功能 | 开源版 | 企业版 |
+|------|--------|--------|
+| 多厂商成本追踪 | ✅ | ✅ |
+| Web 仪表盘 | ✅ | ✅ |
+| 预算预警 | ✅ | ✅ |
+| 飞书/钉钉通知 | ✅ | ✅ |
+| 数据导出 | ✅ | ✅ |
+| 用户管理 | ✅ 基础 | ✅ 高级 RBAC |
+| SSO/LDAP | ❌ | ✅ |
+| 高级报表 | ❌ | ✅ |
+| 企业级支持 | ❌ | ✅ |
 
-database:
-  path: ./data/tokenmeter.db
+**企业版咨询**: contact@tokenmeter.io
 
-providers:
-  openai:
-    base_url: https://api.openai.com/v1
-    api_key: ${OPENAI_API_KEY}
-  azure:
-    base_url: https://your-resource.openai.azure.com
-    api_key: ${AZURE_OPENAI_KEY}
-
-budget:
-  enabled: true
-  alerts:
-    - threshold: 80
-      channels: [webhook]
-    - threshold: 100
-      channels: [webhook, email]
-```
-
-## 🛠️ 开发计划
-
-- [x] 基础代理层
-- [x] 成本统计核心
-- [x] Web 仪表盘
-- [ ] 多厂商支持扩展
-- [ ] 预算预警系统
-- [ ] SSO 集成
-- [ ] 成本优化建议引擎
+---
 
 ## 🤝 贡献指南
 
 欢迎提交 Issue 和 PR！请先阅读 [CONTRIBUTING.md](docs/CONTRIBUTING.md)。
 
+---
+
 ## 📄 许可证
 
-[MIT License](LICENSE)
+[MIT License](LICENSE) - 核心功能完全开源
+
+---
 
 ## 📬 联系我们
 
-- 项目主页: https://github.com/yourusername/tokenmeter
-- 问题反馈: https://github.com/yourusername/tokenmeter/issues
-- 讨论区: https://github.com/yourusername/tokenmeter/discussions
+- 项目主页: https://github.com/mxinghui/tokenmeter
+- 问题反馈: https://github.com/mxinghui/tokenmeter/issues
+- 商务咨询: contact@tokenmeter.io
 
 ---
 
