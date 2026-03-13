@@ -9,6 +9,9 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from .database.models import db_manager
 from .api.routes import router as api_router
+from .api.budget_routes import router as budget_router
+from .api.auth_routes import router as auth_router
+from .api.export_routes import router as export_router
 from .web.dashboard import router as web_router
 from .proxy.handler import ProxyHandler
 from .utils.logging_config import setup_logging, get_logger
@@ -98,6 +101,9 @@ setup_exception_handlers(app)
 
 # 注册路由
 app.include_router(api_router)
+app.include_router(budget_router)
+app.include_router(auth_router)
+app.include_router(export_router)
 app.include_router(web_router)
 
 
