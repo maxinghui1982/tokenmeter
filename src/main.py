@@ -10,18 +10,37 @@ from .database.models import db_manager
 from .api.routes import router as api_router
 from .web.dashboard import router as web_router
 from .proxy.handler import ProxyHandler
+from .utils.logging_config import setup_logging, get_logger
+from .utils.error_handler import (
+    ErrorHandlerMiddleware, 
+    RequestLoggingMiddleware,
+    setup_exception_handlers,
+    APIException,
+    ValidationError
+)
+
+# 配置日志
+logger = get_logger(__name__)
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """应用生命周期管理"""
-    # 启动时初始化数据库
-    print("🚀 Starting TokenMeter...")
+    # 启动时初始化
+    setup_logging(
+        level='INFO',
+        log_file='./logs/tokenmeter.log',
+        json_format=True
+    )
+    logger.info("🚀 Starting TokenMeter...")
+    
     db_manager.init_database()
-    print("✅ TokenMeter is ready!")
+    logger.info("✅ TokenMeter is ready!")
+    
     yield
+    
     # 关闭时清理
-    print("🛑 Shutting down TokenMeter...")
+    logger.info("🛑 Shutting down TokenMeter...")
     db_manager.close()
 
 
@@ -29,9 +48,15 @@ async def lifespan(app: FastAPI):
 app = FastAPI(
     title="TokenMeter",
     description="企业级 MaaS 成本追踪与归因分析平台",
-    version="0.1.0",
+    version="0.5.0",
     lifespan=lifespan
 )
+
+# 添加错误处理中间件（最先添加，最后执行）
+app.add_middleware(ErrorHandlerMiddleware, debug=False)
+
+# 添加请求日志中间件
+app.add_middleware(RequestLoggingMiddleware)
 
 # CORS 中间件
 app.add_middleware(
@@ -41,6 +66,9 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# 设置异常处理器
+setup_exception_handlers(app)
 
 # 注册路由
 app.include_router(api_router)
