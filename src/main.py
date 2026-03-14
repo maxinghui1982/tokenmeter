@@ -22,6 +22,7 @@ from .utils.error_handler import (
     APIException,
     ValidationError,
 )
+from .middleware.rate_limit import RateLimitMiddleware
 
 # 配置日志
 logger = get_logger(__name__)
@@ -78,6 +79,9 @@ app = FastAPI(
 
 # 添加错误处理中间件（最先添加，最后执行）
 app.add_middleware(ErrorHandlerMiddleware, debug=False)
+
+# 添加速率限制中间件
+app.add_middleware(RateLimitMiddleware)
 
 # 添加请求日志中间件
 app.add_middleware(RequestLoggingMiddleware)

@@ -4,26 +4,34 @@ TokenMeter Auth Routes
 """
 from datetime import datetime, timedelta
 from typing import Optional
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Request
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from sqlalchemy.orm import Session
 from pydantic import BaseModel, Field
 import jwt
-import os
 
 from ..database.models import get_db
 from ..database.user_models import User, UserManager
-from ..utils.logging_config import get_logger, info, error
+from ..utils.logging_config import get_logger, info, error, warning
+from ..config.settings import settings
+from ..middleware.rate_limit import login_limiter
 
 router = APIRouter(prefix="/api/v1/auth", tags=["auth"])
 logger = get_logger(__name__)
 
 # JWT 配置
-JWT_SECRET = os.getenv("JWT_SECRET", "your-secret-key-change-in-production")
-JWT_ALGORITHM = "HS256"
-JWT_EXPIRATION_HOURS = 24
+JWT_SECRET = settings.JWT_SECRET
+JWT_ALGORITHM = settings.JWT_ALGORITHM
+JWT_EXPIRATION_HOURS = settings.JWT_EXPIRATION_HOURS
 
 security = HTTPBearer()
+
+
+def get_client_identifier(request: Request, username: str) -> str:
+    """获取客户端标识（用于登录限制）"""
+    # 使用用户名 + IP 作为标识
+    client_ip = request.client.host if request.client else "unknown"
+    return f"{username}:{client_ip}"
 
 
 # ============ Pydantic 模型 ============
@@ -150,11 +158,33 @@ async def register(user_data: UserRegister, db: Session = Depends(get_db)):
 
 
 @router.post("/login", response_model=TokenResponse)
-async def login(credentials: UserLogin, db: Session = Depends(get_db)):
+async def login(
+    request: Request, credentials: UserLogin, db: Session = Depends(get_db)
+):
     """用户登录"""
+    # 获取客户端标识
+    client_id = get_client_identifier(request, credentials.username)
+
+    # 检查登录限制
+    is_allowed, lockout_minutes = login_limiter.is_allowed(client_id)
+    if not is_allowed:
+        warning(
+            logger,
+            "Login attempt blocked due to too many failed attempts",
+            username=credentials.username,
+            client_id=client_id,
+        )
+        raise HTTPException(
+            status_code=status.HTTP_429_TOO_MANY_REQUESTS,
+            detail=f"登录尝试过多，请在 {lockout_minutes} 分钟后重试",
+        )
+
     try:
         manager = UserManager(db)
         user = manager.authenticate(credentials.username, credentials.password)
+
+        # 登录成功，重置失败计数
+        login_limiter.reset(client_id)
 
         token = create_access_token(user.id)
 
@@ -168,6 +198,21 @@ async def login(credentials: UserLogin, db: Session = Depends(get_db)):
         }
 
     except ValueError as e:
+        # 登录失败，记录尝试
+        lockout = login_limiter.record_attempt(client_id)
+        if lockout:
+            warning(
+                logger,
+                "Account locked due to too many failed login attempts",
+                username=credentials.username,
+                client_id=client_id,
+                lockout_minutes=lockout,
+            )
+            raise HTTPException(
+                status_code=status.HTTP_429_TOO_MANY_REQUESTS,
+                detail=f"登录尝试过多，账户已锁定 {lockout} 分钟",
+            )
+
         raise HTTPException(status_code=401, detail=str(e))
     except Exception as e:
         error(logger, "Login failed", error=str(e))

@@ -1,0 +1,80 @@
+# TokenMeter 生产环境 Docker Compose 配置
+# 使用方法: docker-compose -f docker-compose.prod.yml up -d
+
+version: '3.8'
+
+services:
+  tokenmeter:
+    build:
+      context: .
+      target: production
+    image: tokenmeter:latest
+    container_name: tokenmeter-app
+    ports:
+      - "8080:8080"
+    environment:
+      # 基础配置
+      - DATABASE_URL=sqlite:///data/tokenmeter.db
+      - LOG_LEVEL=INFO
+      - ENV=production
+      
+      # JWT 安全配置（生产环境必须修改！）
+      - JWT_SECRET=${JWT_SECRET:-change-this-in-production}
+      
+      # 可选：外部API Keys（建议通过环境变量或secrets管理）
+      # - OPENAI_API_KEY=${OPENAI_API_KEY}
+      # - AZURE_OPENAI_KEY=${AZURE_OPENAI_KEY}
+      # - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+      # - DASHSCOPE_API_KEY=${DASHSCOPE_API_KEY}
+      
+      # 代理配置
+      # - HTTP_PROXY=${HTTP_PROXY}
+      # - HTTPS_PROXY=${HTTPS_PROXY}
+    volumes:
+      - tokenmeter_data:/app/data
+      - tokenmeter_logs:/app/logs
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    read_only: true
+    tmpfs:
+      - /tmp:noexec,nosuid,size=100m
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8080/api/v1/health')"]
+      interval: 30s
+      timeout: 10s
+      start_period: 10s
+      retries: 3
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 512M
+        reservations:
+          cpus: '0.25'
+          memory: 128M
+
+  # Nginx 反向代理（可选）
+  nginx:
+    image: nginx:alpine
+    container_name: tokenmeter-nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/ssl:/etc/nginx/ssl:ro
+      - nginx_logs:/var/log/nginx
+    depends_on:
+      - tokenmeter
+    restart: unless-stopped
+    profiles:
+      - with-nginx
+
+volumes:
+  tokenmeter_data:
+    driver: local
+  tokenmeter_logs:
+    driver: local
+  nginx_logs:
+    driver: local
