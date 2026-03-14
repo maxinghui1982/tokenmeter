@@ -220,7 +220,7 @@ class ProxyHandler:
             completion_tokens=completion_tokens,
             total_tokens=total_tokens,
             cost_input=cost["input_cost"],
-            cost_output=cost["output_cost"),
+            cost_output=cost["output_cost"],
             cost_total=cost["total_cost"],
             project=project,
             team=team,
