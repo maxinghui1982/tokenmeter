@@ -23,6 +23,8 @@ from .utils.error_handler import (
     ValidationError,
 )
 from .middleware.rate_limit import RateLimitMiddleware
+from .monitoring.metrics import init_metrics, metrics_middleware
+from .monitoring.routes import router as metrics_router
 
 # 配置日志
 logger = get_logger(__name__)
@@ -62,6 +64,9 @@ async def lifespan(app: FastAPI):
     setup_logging(level="INFO", log_file="./logs/tokenmeter.log", json_format=True)
     logger.info("🚀 Starting TokenMeter...")
 
+    # 初始化监控指标
+    init_metrics(app_version="0.5.0", app_env=os.getenv("ENV", "development"))
+
     db_manager.init_database()
     logger.info("✅ TokenMeter is ready!")
 
@@ -98,7 +103,12 @@ app.add_middleware(
 # 设置异常处理器
 setup_exception_handlers(app)
 
+# 添加 Prometheus 指标中间件
+PrometheusMiddleware = metrics_middleware()
+app.add_middleware(PrometheusMiddleware)
+
 # 注册路由
+app.include_router(metrics_router)  # Prometheus 指标端点
 app.include_router(api_router)
 app.include_router(budget_router)
 app.include_router(auth_router)
