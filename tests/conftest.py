@@ -6,7 +6,8 @@ import os
 import sys
 
 # 添加项目根目录到路径
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+
 
 @pytest.fixture
 def mock_openai_response():
@@ -19,18 +20,11 @@ def mock_openai_response():
         "choices": [
             {
                 "index": 0,
-                "message": {
-                    "role": "assistant",
-                    "content": "Hello!"
-                },
-                "finish_reason": "stop"
+                "message": {"role": "assistant", "content": "Hello!"},
+                "finish_reason": "stop",
             }
         ],
-        "usage": {
-            "prompt_tokens": 10,
-            "completion_tokens": 20,
-            "total_tokens": 30
-        }
+        "usage": {"prompt_tokens": 10, "completion_tokens": 20, "total_tokens": 30},
     }
 
 
@@ -50,5 +44,5 @@ def sample_usage_record():
         "project": "test-project",
         "team": "test-team",
         "environment": "test",
-        "user_id": "test-user"
+        "user_id": "test-user",
     }

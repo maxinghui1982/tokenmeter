@@ -53,20 +53,16 @@ DEFAULT_PRICING = {
 
 class CostCalculator:
     """成本计算器"""
-    
+
     def __init__(self, custom_pricing: Optional[Dict] = None):
         self.pricing = custom_pricing or DEFAULT_PRICING
-    
+
     def calculate_cost(
-        self, 
-        provider: str, 
-        model: str, 
-        prompt_tokens: int, 
-        completion_tokens: int
+        self, provider: str, model: str, prompt_tokens: int, completion_tokens: int
     ) -> Dict[str, float]:
         """
         计算单次调用的成本
-        
+
         Returns:
             {
                 "input_cost": float,    # 输入成本
@@ -77,45 +73,41 @@ class CostCalculator:
         # 获取模型定价
         provider_pricing = self.pricing.get(provider.lower(), {})
         model_pricing = provider_pricing.get(model, {})
-        
+
         # 如果没找到定价，尝试模糊匹配
         if not model_pricing:
             model_pricing = self._fuzzy_match_model(provider, model)
-        
+
         if not model_pricing:
             # 使用默认定价或返回0
-            return {
-                "input_cost": 0.0,
-                "output_cost": 0.0,
-                "total_cost": 0.0
-            }
-        
+            return {"input_cost": 0.0, "output_cost": 0.0, "total_cost": 0.0}
+
         # 计算成本（价格 per 1K tokens）
         input_cost = (prompt_tokens / 1000) * model_pricing.get("input", 0)
         output_cost = (completion_tokens / 1000) * model_pricing.get("output", 0)
-        
+
         return {
             "input_cost": round(input_cost, 6),
             "output_cost": round(output_cost, 6),
-            "total_cost": round(input_cost + output_cost, 6)
+            "total_cost": round(input_cost + output_cost, 6),
         }
-    
+
     def _fuzzy_match_model(self, provider: str, model: str) -> Optional[Dict]:
         """模糊匹配模型名称"""
         provider_pricing = self.pricing.get(provider.lower(), {})
-        
+
         # 尝试前缀匹配
         for model_key, pricing in provider_pricing.items():
             if model.startswith(model_key) or model_key in model:
                 return pricing
-        
+
         return None
-    
+
     def get_model_pricing(self, provider: str, model: str) -> Optional[Dict]:
         """获取模型定价信息"""
         provider_pricing = self.pricing.get(provider.lower(), {})
         return provider_pricing.get(model)
-    
+
     def list_available_models(self, provider: Optional[str] = None) -> Dict:
         """列出可用的模型定价"""
         if provider:

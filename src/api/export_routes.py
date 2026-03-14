@@ -27,7 +27,7 @@ async def export_usage_records(
     provider: Optional[str] = Query(None),
     format: str = Query("csv", regex="^(csv)$"),
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user)
+    current_user: User = Depends(get_current_user),
 ):
     """导出使用记录"""
     try:
@@ -38,7 +38,7 @@ async def export_usage_records(
             start = datetime.fromisoformat(start_date)
         if end_date:
             end = datetime.fromisoformat(end_date)
-        
+
         service = ExportService(db)
         content, filename, content_type = service.export_usage_records(
             start_date=start,
@@ -46,19 +46,22 @@ async def export_usage_records(
             project=project,
             team=team,
             provider=provider,
-            format=format
+            format=format,
         )
-        
-        info(logger, "Usage records exported",
-             user_id=current_user.id,
-             records_count=content.count('\n') - 1)
-        
+
+        info(
+            logger,
+            "Usage records exported",
+            user_id=current_user.id,
+            records_count=content.count("\n") - 1,
+        )
+
         return PlainTextResponse(
             content=content,
             media_type=content_type,
-            headers={"Content-Disposition": f"attachment; filename={filename}"}
+            headers={"Content-Disposition": f"attachment; filename={filename}"},
         )
-        
+
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -68,7 +71,7 @@ async def export_summary_report(
     start_date: Optional[str] = Query(None, description="Start date (ISO format)"),
     end_date: Optional[str] = Query(None, description="End date (ISO format)"),
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user)
+    current_user: User = Depends(get_current_user),
 ):
     """导出汇总报告"""
     try:
@@ -78,20 +81,19 @@ async def export_summary_report(
             start = datetime.fromisoformat(start_date)
         if end_date:
             end = datetime.fromisoformat(end_date)
-        
+
         service = ExportService(db)
         content, filename, content_type = service.export_summary_report(
-            start_date=start,
-            end_date=end
+            start_date=start, end_date=end
         )
-        
+
         info(logger, "Summary report exported", user_id=current_user.id)
-        
+
         return PlainTextResponse(
             content=content,
             media_type=content_type,
-            headers={"Content-Disposition": f"attachment; filename={filename}"}
+            headers={"Content-Disposition": f"attachment; filename={filename}"},
         )
-        
+
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
