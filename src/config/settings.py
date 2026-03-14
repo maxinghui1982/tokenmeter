@@ -56,15 +56,13 @@ def get_settings() -> Settings:
         # 检查 JWT_SECRET
         if not settings.JWT_SECRET or settings.JWT_SECRET == "your-secret-key-change-in-production":
             raise ValueError(
-                "生产环境必须设置 JWT_SECRET 环境变量！\n"
-                "请运行: export JWT_SECRET=$(openssl rand -hex 32)"
+                "生产环境必须设置 JWT_SECRET 环境变量！\n" "请运行: export JWT_SECRET=$(openssl rand -hex 32)"
             )
 
         # 检查是否是默认密钥
         if len(settings.JWT_SECRET) < 32:
             raise ValueError(
-                "JWT_SECRET 长度必须至少 32 个字符！\n"
-                "请运行: export JWT_SECRET=$(openssl rand -hex 32)"
+                "JWT_SECRET 长度必须至少 32 个字符！\n" "请运行: export JWT_SECRET=$(openssl rand -hex 32)"
             )
 
     # 如果 JWT_SECRET 未设置，生成一个随机密钥（仅开发环境）

@@ -18,9 +18,7 @@ class TestOpenAIProvider:
 
     def test_get_target_url(self):
         """测试目标 URL 生成"""
-        config = ProviderConfig(
-            name="openai", base_url="https://api.openai.com/v1"
-        )
+        config = ProviderConfig(name="openai", base_url="https://api.openai.com/v1")
         provider = OpenAIProvider(config)
 
         url = provider.get_target_url("/chat/completions")
@@ -148,9 +146,7 @@ class TestAnthropicProvider:
 
     def test_get_target_url(self):
         """测试目标 URL 生成"""
-        config = ProviderConfig(
-            name="anthropic", base_url="https://api.anthropic.com/v1"
-        )
+        config = ProviderConfig(name="anthropic", base_url="https://api.anthropic.com/v1")
         provider = AnthropicProvider(config)
 
         url = provider.get_target_url("/messages")
@@ -195,18 +191,9 @@ class TestAnthropicProvider:
         config = ProviderConfig(name="anthropic", base_url="https://api.anthropic.com")
         provider = AnthropicProvider(config)
 
-        assert (
-            provider.normalize_model_name("claude-3-opus")
-            == "claude-3-opus-20240229"
-        )
-        assert (
-            provider.normalize_model_name("claude-3-sonnet")
-            == "claude-3-sonnet-20240229"
-        )
-        assert (
-            provider.normalize_model_name("claude-3-haiku")
-            == "claude-3-haiku-20240307"
-        )
+        assert provider.normalize_model_name("claude-3-opus") == "claude-3-opus-20240229"
+        assert provider.normalize_model_name("claude-3-sonnet") == "claude-3-sonnet-20240229"
+        assert provider.normalize_model_name("claude-3-haiku") == "claude-3-haiku-20240307"
 
 
 class TestDashScopeProvider:
@@ -214,9 +201,7 @@ class TestDashScopeProvider:
 
     def test_get_target_url(self):
         """测试目标 URL 生成"""
-        config = ProviderConfig(
-            name="dashscope", base_url="https://dashscope.aliyuncs.com/api/v1"
-        )
+        config = ProviderConfig(name="dashscope", base_url="https://dashscope.aliyuncs.com/api/v1")
         provider = DashScopeProvider(config)
 
         url = provider.get_target_url("/services/aigc/text-generation/generation")
@@ -238,9 +223,7 @@ class TestDashScopeProvider:
 
     def test_extract_model(self):
         """测试模型提取"""
-        config = ProviderConfig(
-            name="dashscope", base_url="https://dashscope.aliyuncs.com"
-        )
+        config = ProviderConfig(name="dashscope", base_url="https://dashscope.aliyuncs.com")
         provider = DashScopeProvider(config)
 
         body = {"model": "qwen-max", "input": {}}
@@ -249,9 +232,7 @@ class TestDashScopeProvider:
 
     def test_normalize_model_name(self):
         """测试模型名称标准化"""
-        config = ProviderConfig(
-            name="dashscope", base_url="https://dashscope.aliyuncs.com"
-        )
+        config = ProviderConfig(name="dashscope", base_url="https://dashscope.aliyuncs.com")
         provider = DashScopeProvider(config)
 
         assert provider.normalize_model_name("qwen-max") == "qwen-max"

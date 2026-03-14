@@ -29,9 +29,7 @@ class RateLimiter:
 
         # 清理过期记录
         if client_id in self.clients:
-            self.clients[client_id] = [
-                ts for ts in self.clients[client_id] if ts > window_start
-            ]
+            self.clients[client_id] = [ts for ts in self.clients[client_id] if ts > window_start]
         else:
             self.clients[client_id] = []
 

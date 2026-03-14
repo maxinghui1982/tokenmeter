@@ -158,9 +158,7 @@ async def register(user_data: UserRegister, db: Session = Depends(get_db)):
 
 
 @router.post("/login", response_model=TokenResponse)
-async def login(
-    request: Request, credentials: UserLogin, db: Session = Depends(get_db)
-):
+async def login(request: Request, credentials: UserLogin, db: Session = Depends(get_db)):
     """用户登录"""
     # 获取客户端标识
     client_id = get_client_identifier(request, credentials.username)
